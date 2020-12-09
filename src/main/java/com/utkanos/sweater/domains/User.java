@@ -75,6 +75,13 @@ public class User implements UserDetails, Serializable {
 
     //functions
 
+    public ArrayList<Message> getListOfMessages() {
+        return messages
+                .stream()
+                .sorted((mess1, mess2) -> mess2.getTime().compareTo(mess1.getTime()))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
     public int getAmountOfSubscriptions() { return subscriptions.size(); }
 
     public boolean isAdmin() {

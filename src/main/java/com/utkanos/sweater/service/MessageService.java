@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -25,6 +26,7 @@ public class MessageService {
     private String uploadPath;
 
     public boolean addMessage(Message message, MultipartFile file) throws IOException {
+        message.setTime(new Date().getTime());
         //если не пустой файл, то добавляем его в бд
         if (file != null && !file.isEmpty()) {
             File uploadDir = new File(uploadPath);

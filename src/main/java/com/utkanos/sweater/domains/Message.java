@@ -4,6 +4,10 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Objects;
 
 @Entity
@@ -25,6 +29,8 @@ public class Message {
 
     private String filename;
 
+    private Long time;
+
     public Message(String text, String tag, User user) {
         this.author = user;
         this.text = text;
@@ -32,6 +38,16 @@ public class Message {
     }
 
     public Message() {
+    }
+
+    //functions
+
+    public String getTimeString() {
+        try {
+            return new SimpleDateFormat("dd MMMM yyyy, H:m").format(time);
+        } catch (IllegalArgumentException ex) {
+            return "not so far...";
+        }
     }
 
     @Override
@@ -49,6 +65,15 @@ public class Message {
 
 
     //getters and setters
+
+
+    public Long getTime() {
+        return time;
+    }
+
+    public void setTime(Long time) {
+        this.time = time;
+    }
 
     public User getAuthor() {
         return author;

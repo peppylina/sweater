@@ -93,6 +93,7 @@
             <#if mess.tag??>
                 <h5 class="card-title">${mess.tag}</h5>
             </#if>
+            <p class="card-text">${mess.getTimeString()}</p>
             <p class="card-text">${mess.text!" "}</p>
             <a href="/profiles/${mess.authorId}" class="card-link">${mess.authorName}</a>
         </div>

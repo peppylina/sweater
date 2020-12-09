@@ -16,7 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 @Controller
 public class MainController {
@@ -39,15 +44,17 @@ public class MainController {
             @RequestParam(required = false, defaultValue = "") String textFilter,
             Map<String, Object> model
     ) {
-        Iterable<Message> messages;
+        ArrayList<Message> messages = new ArrayList<>();
         //если у нас какой либо из фильтров не пустой, то берем сообщения по этому фильтру
         if (tagFilter != null && !tagFilter.isEmpty()) {
-            messages = messageService.findByTag(tagFilter);
+            messageService.findByTag(tagFilter).forEach(messages::add);
         } else if(textFilter != null && !textFilter.isEmpty()) {
-            messages = messageService.findByText(textFilter);
+            messageService.findByText(textFilter).forEach(messages::add);
         } else {
-            messages = messageService.findAll();
+            messageService.findAll().forEach(messages::add);
         }
+
+        messages.sort((mess1, mess2) -> mess2.getTime().compareTo(mess1.getTime()));
 
         model.put("messages", messages);
         model.put("textFilter", textFilter);
@@ -76,11 +83,7 @@ public class MainController {
             model.addAttribute("response", "OK");
         }
 
-        model.addAttribute("message", null);
-        //отправляем сообщения в форму
-        Iterable<Message> messages = messageService.findAll();
-        model.addAttribute("messages", messages);
-        return "main";
+        return "redirect:/main";
     }
 
 

@@ -70,7 +70,7 @@ User user
 </div>
 </#if>
 
-<#if user.messages??>
+<#if user.getListOfMessages()??>
     <#include "parts/messageList.ftlh" />
 <#else>
     No posts yet!
