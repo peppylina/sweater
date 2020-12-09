@@ -1,6 +1,6 @@
-drop TABLE `spring_session_attributes`;
+drop TABLE IF EXISTS `spring_session_attributes`;
 
-drop TABLE `sweater`.`spring_session`;
+drop TABLE IF EXISTS `sweater`.`spring_session`;
 
 
 create table user_subscriptions (

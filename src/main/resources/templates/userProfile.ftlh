@@ -27,14 +27,14 @@ User user
             </div>
         </div>
         <!-- подписчики-->
-        <div class="col-md-auto">
+        <div class="col-md-auto my-3">
             <a href="/subscribers?id=${user.id}"  type="button" class="btn btn-primary">
                 Подписчики <span class="badge badge-light">${user.getAmountOfSubscribers()}</span>
             </a>
         </div>
 
         <!-- подписки-->
-        <div class="col-md-auto">
+        <div class="col-md-auto my-3">
             <a href="/subscriptions?id=${user.id}"  type="button" class="btn btn-primary">
                 Подписки <span class="badge badge-light">${user.getAmountOfSubscriptions()}</span>
             </a>

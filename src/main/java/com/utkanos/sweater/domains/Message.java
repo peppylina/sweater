@@ -44,7 +44,7 @@ public class Message {
 
     public String getTimeString() {
         try {
-            return new SimpleDateFormat("dd MMMM yyyy, H:m").format(time);
+            return new SimpleDateFormat("dd MMMM yyyy, H:mm").format(time);
         } catch (IllegalArgumentException ex) {
             return "not so far...";
         }
