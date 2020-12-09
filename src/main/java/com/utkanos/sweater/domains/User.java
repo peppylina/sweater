@@ -7,10 +7,8 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "usr")
@@ -28,6 +26,8 @@ public class User implements UserDetails, Serializable {
 
     @Transient
     private String password2 = "";
+
+    private String ava = "default.png";
 
     @NotBlank(message = "email can not be empty")
     @Email(message = "Email is incorrect!")
@@ -54,10 +54,58 @@ public class User implements UserDetails, Serializable {
     private Set<Role> roles;
 
 
+    //подписчики пользователя
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_subscriptions",
+            joinColumns = {@JoinColumn(name = "profile_id")},
+            inverseJoinColumns = {@JoinColumn(name = "subscriber_id")}
+    )
+    private Set<User> subscribers = new HashSet<>();
+
+    //подписки пользователя
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_subscriptions",
+            joinColumns = {@JoinColumn(name = "subscriber_id")},
+            inverseJoinColumns = {@JoinColumn(name = "profile_id")}
+    )
+    private Set<User> subscriptions = new HashSet<>();
+
+
     //functions
+
+    public int getAmountOfSubscriptions() { return subscriptions.size(); }
 
     public boolean isAdmin() {
         return roles.contains(Role.ADMIN);
+    }
+
+    public int getAmountOfSubscribers() {
+        return subscribers.size();
+    }
+
+    public ArrayList<User> getListOfSubscribers() {
+        return subscribers
+                    .stream()
+                    .sorted((user1, user2) ->
+                        user1.getUsername().compareToIgnoreCase(user2.getUsername()))
+                    .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public ArrayList<User> getListOfSubscriptions() {
+        return subscriptions
+                .stream()
+                .sorted((user1, user2) ->
+                        user1.getUsername().compareToIgnoreCase(user2.getUsername()))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public boolean hasSubscriber(int subId) {
+        for (User sub : getListOfSubscribers()) {
+            if(sub.getId() == subId) return true;
+        }
+        return false;
     }
 
     @Override
@@ -104,6 +152,22 @@ public class User implements UserDetails, Serializable {
 
     //getters and setters
 
+
+    public Set<User> getSubscribers() {
+        return subscribers;
+    }
+
+    public void setSubscribers(Set<User> subscribers) {
+        this.subscribers = subscribers;
+    }
+
+    public Set<User> getSubscriptions() {
+        return subscriptions;
+    }
+
+    public void setSubscriptions(Set<User> subscriptions) {
+        this.subscriptions = subscriptions;
+    }
 
     public Set<Message> getMessages() {
         return messages;
