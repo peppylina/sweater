@@ -5,12 +5,19 @@ import com.utkanos.sweater.domains.User;
 import com.utkanos.sweater.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +36,9 @@ public class UserService implements UserDetailsService {
 
     @Value("${activation.url}")
     private String activationUrl;
+
+    @Value("${upload.path}/avas")
+    private String avasPath;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -95,6 +105,30 @@ public class UserService implements UserDetailsService {
         userRepo.save(user);
     }
 
+    /*
+    * Возвращает имя файла, если получилось загрузить, и выкидывает ошибку в противном случае
+    * */
+    public String setUserAva(User user, MultipartFile file) throws Exception{
+        if (file != null && !file.isEmpty()) {
+            //сперва удаляем старую аву, если она есть
+            deleteAva(user);
+            //тепер загружаем новую
+            File uploadDir = new File(avasPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            }
+            //генерируем рандомное имя файла
+            String uuidFile = UUID.randomUUID().toString();
+            String resFilename = String.format("%s.%s", uuidFile, file.getOriginalFilename());
+            //делаем полный путь к файлу
+            String resUploadPath = String.format("%s/%s", avasPath, resFilename);
+            //загружаем файл
+            file.transferTo(new File(resUploadPath));
+            return resFilename;
+        }
+        return user.getAva();
+    }
+
     public boolean updateUserInfo(User user, User curUser) {
         //сохраняем новый логин
         curUser.setUsername(user.getUsername());
@@ -129,5 +163,34 @@ public class UserService implements UserDetailsService {
 
     public void deleteById(Long id) {
         userRepo.deleteById(id);
+    }
+
+    /*
+    * Удаление авы из папки на сервере и из бд
+    * */
+    public boolean deleteAva(User curUser){
+        //удаляем из папки
+        File file = new File(String.format("%s/%s", avasPath, curUser.getAva()));
+        if (file.delete()) {
+            //Удаляем запись в базе данных
+            curUser.setAva(null);
+            userRepo.save(curUser);
+            return true;
+        }
+        return false;
+    }
+
+    /*
+    * Обновляет информацию о текущем пользователе в SpringSecurity
+    * */
+    public void updateAuthPrincipal(User user) {
+        SecurityContext ctx = SecurityContextHolder.getContext();
+        User principal = (User) ctx.getAuthentication().getPrincipal();
+        //если нам подсунули того же пользователя, что и авторизован, то обновляем инфу о нем
+        if(user.equals(principal)) {
+            Authentication token =
+                    new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
+            ctx.setAuthentication(token);
+        }
     }
 }

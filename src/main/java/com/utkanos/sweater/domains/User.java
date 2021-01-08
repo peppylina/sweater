@@ -27,7 +27,7 @@ public class User implements UserDetails, Serializable {
     @Transient
     private String password2 = "";
 
-    private String ava = "default.png";
+    private String ava = null;
 
     @NotBlank(message = "email can not be empty")
     @Email(message = "Email is incorrect!")
@@ -159,6 +159,13 @@ public class User implements UserDetails, Serializable {
 
     //getters and setters
 
+    public String getAva() {
+        return ava;
+    }
+
+    public void setAva(String ava) {
+        this.ava = ava;
+    }
 
     public Set<User> getSubscribers() {
         return subscribers;

@@ -48,7 +48,6 @@ public class MvcConfig implements WebMvcConfigurer {
         mappings.setProperty("FileSizeLimitExceededException", "exceptions/fileSizeError"); //для такого исключения будет отображаться своя страничка
         mappings.setProperty("MaxUploadSizeExceededException", "exceptions/fileSizeError");
 
-
         r.setExceptionMappings(mappings);  // None by default
         r.setDefaultErrorView("error");    // No default
         r.setExceptionAttribute("ex");     // Default is "exception"

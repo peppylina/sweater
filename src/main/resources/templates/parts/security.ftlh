@@ -10,10 +10,10 @@
         isAdmin = user.isAdmin()
         curId = user.getId()
         authorised = true>
-    <#else>
-        <#assign
-            name = "unknown"
-            isAdmin = false
-            curId = -1
-            authorised = false>
+<#else>
+    <#assign
+        name = "unknown"
+        isAdmin = false
+        curId = -1
+        authorised = false>
 </#if>

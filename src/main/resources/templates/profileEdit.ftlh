@@ -7,8 +7,27 @@
     <#assign user = Session.SPRING_SECURITY_CONTEXT.authentication.principal>
 </#if>
 
-<!--action не указываем, так как отправляем на ото же адрес post-запрос-->
-<form method="post" class="was-validated">
+<!--action не указываем, так как отправляем на тот же адрес post-запрос-->
+<form method="post" class="was-validated" enctype="multipart/form-data">
+    <!-- AVA -->
+    <div class="row">
+        <div class="col-md-auto my-3">
+            <img width="150" src="${hostUrl}/img/avas/<#if user.ava??>${user.ava}<#else>default.png</#if>"/>
+        </div>
+        <div class="col-md-auto my-3">
+            <p style="font-size:20px;color:orange">Изменить заставку:</p>
+            <input class="form-control-file" type="file" name="file"/>
+        </div>
+        <#if fileError??>
+            <div class="invalid-feedback">
+                ${fileError}
+            </div>
+        </#if>
+        <!-- Кнопка удалить аватарку -->
+        <div class="col-md my-3">
+            <input type="submit" class="btn btn-danger" formaction="/profiles/deleteAva" value="Удалить изображение"/>
+        </div>
+    </div>
     <div class="form-group">
         <!-- USERNAME -->
         <label for="inputUsername">User name: </label>
@@ -34,7 +53,7 @@
     </div>
     <!-- PASSWORD2 -->
     <div class="form-group">
-        <label for="inputPassword2">Password: </label>
+        <label for="inputPassword2">Confirm password: </label>
         <!--<input type="hidden" name="password2" value="${user.password!'1'}">-->
         <input type="password" class="form-control ${(password2Error??)?string('is-invalid', '')}"
                name="password2" id="inputPassword2" placeholder="New password"/>

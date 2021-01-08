@@ -17,15 +17,15 @@ isSubscribersPage - true или false - показывает, на какой м
     <#list user.getListOfSubscribers() as sub>
         <div class="container">
             <div class="row">
-                <div class="col">
+                <div class="col-md-auto">
                     <#if sub.ava??>
-                        <img src="img/avas/${sub.ava}">
+                        <img width="100" height="100" src="img/avas/${sub.ava}">
                     <#else>
-                        <img src="img/avas/default.png">
+                        <img width="100" height="100" src="img/avas/default.png">
                     </#if>
                 </div>
                 <div class="col">
-                    <a href="/profiles/${sub.id}">${sub.username}</a>
+                    <a style="font-size: 24px; color: Orange" href="/profiles/${sub.id}">${sub.username}</a>
                 </div>
             </div>
         </div>
@@ -38,15 +38,15 @@ isSubscribersPage - true или false - показывает, на какой м
     <#list user.getListOfSubscriptions() as sub>
         <div class="container">
             <div class="row">
-                <div class="col">
+                <div class="col-md-auto">
                     <#if sub.ava??>
-                        <img src="img/avas/${sub.ava}">
+                        <img width="100" height="100" src="${hostUrl}/img/avas/${sub.ava}">
                     <#else>
-                        <img src="img/avas/default.png">
+                        <img width="100" height="100" src="${hostUrl}/img/avas/default.png">
                     </#if>
                 </div>
                 <div class="col">
-                    <a href="/profiles/${sub.id}">${sub.username}</a>
+                    <a style="font-size: 24px; color: Orange" href="/profiles/${sub.id}">${sub.username}</a>
                 </div>
             </div>
         </div>

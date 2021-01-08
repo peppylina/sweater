@@ -3,6 +3,7 @@ package com.utkanos.sweater.controllers;
 import com.utkanos.sweater.domains.User;
 import com.utkanos.sweater.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +17,9 @@ public class SubscribersController {
     @Autowired
     private UserService userService;
 
+    @Value("http://${hostname}")
+    private String hostUrl;
+
     @GetMapping("/subscribers")
     public String getListOfSubscribers(
             Model model,
@@ -23,6 +27,7 @@ public class SubscribersController {
     ) {
         model.addAttribute("isSubscribersPage", true);
         model.addAttribute("user", user);
+        model.addAttribute("hostUrl", hostUrl);
         return "listOfSubs";
     }
 
@@ -33,6 +38,7 @@ public class SubscribersController {
     ) {
         model.addAttribute("isSubscribersPage", false);
         model.addAttribute("user", user);
+        model.addAttribute("hostUrl", hostUrl);
         return "listOfSubs";
     }
 

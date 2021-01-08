@@ -2,19 +2,22 @@ package com.utkanos.sweater.controllers;
 
 import com.utkanos.sweater.domains.User;
 import com.utkanos.sweater.service.UserService;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.AuthenticatedPrincipal;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.security.Principal;
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,12 +28,16 @@ public class ProfileController {
     @Autowired
     private UserService userService;
 
+    @Value("http://${hostname}")
+    private String hostUrl;
+
     @GetMapping("/{userId}")
     public String getProfilePage(
             @PathVariable(name = "userId") User user,
             Model model
             ) {
         model.addAttribute("user", user);
+        model.addAttribute("hostUrl", hostUrl);
         return "userProfile";
     }
 
@@ -39,6 +46,7 @@ public class ProfileController {
             Model model, @AuthenticationPrincipal User user
     ){
         model.addAttribute("user", user);
+        model.addAttribute("hostUrl", hostUrl);
         return "profileEdit";
     }
 
@@ -48,8 +56,12 @@ public class ProfileController {
             @AuthenticationPrincipal User curUser,
             @Valid User user,
             BindingResult  bindingResult,
+            @RequestParam("file") MultipartFile file,
             Model model
-    ) {
+    ) throws IOException, FileSizeLimitExceededException {
+        //Данные, которые по-любому возвращаются
+        model.addAttribute("hostUrl", hostUrl);
+
         //если хоть одно поле непустое
         if ((user.getPassword() != null && !user.getPassword().equals("")) ||
                 (user.getPassword2() != null && !user.getPassword2().equals(""))) {
@@ -76,7 +88,7 @@ public class ProfileController {
             return "profileEdit";
         }
 
-        //если поменя почту
+        //если поменяли почту
         if (!curUser.getEmail().equals(user.getEmail())) {
             user.setActivationCode(UUID.randomUUID().toString());
             user.setActive(false);
@@ -95,7 +107,15 @@ public class ProfileController {
             user.setPassword(curUser.getPassword());
         }
 
+        //Пробуем сохранить файл. если пустой, то так и останется null, иначе получим имя файла. Также ловим исключения
+        String avaFilename = null;
+        try {
+            avaFilename = userService.setUserAva(curUser, file);
+        } catch (Exception ex) {
+            model.addAttribute("fileError", "Ошибка при добавлении Вашего изображения");
+        }
 
+        curUser.setAva(avaFilename);
         curUser.setPassword(user.getPassword());
         curUser.setUsername(user.getUsername());
         curUser.setEmail(user.getEmail());
@@ -105,7 +125,26 @@ public class ProfileController {
         model.addAttribute("isChanged", "true");
         userService.saveUserToDb(curUser);
 
+        //обновляем информацию для Spring Security.
+        userService.updateAuthPrincipal(curUser);
+
         model.addAttribute("user", curUser);
+        return "profileEdit";
+    }
+
+    @PostMapping("/deleteAva")
+    public String deleteAva(
+            @AuthenticationPrincipal User curUser,
+            Model model
+    ) {
+        if(!userService.deleteAva(curUser)) {
+            model.addAttribute("fileError", "Невозможно удалить изображение");
+        }
+        //обновляем информацию для Spring Security.
+        userService.updateAuthPrincipal(curUser);
+
+        model.addAttribute("user", curUser);
+        model.addAttribute("hostUrl", hostUrl);
         return "profileEdit";
     }
 

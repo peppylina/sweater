@@ -1,4 +1,4 @@
-*.properties
+application.properties
 .ssh/*
 scripts/*
 upload/*

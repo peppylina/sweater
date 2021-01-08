@@ -7,7 +7,6 @@
 <!--
 @RequestParams:
 User user
-
 -->
 
 <@c.page>
@@ -40,7 +39,15 @@ User user
             </a>
         </div>
     </div>
+    <div class="row-md-auto">
+        <#if user.ava??>
+            <img width="150" src="${hostUrl}/img/avas/${user.ava}"/>
+        <#else>
+            <img width="150" src="${hostUrl}/img/avas/default.png"/>
+        </#if>
+    </div>
 </div>
+
 
 
 
