@@ -9,9 +9,9 @@
     </div>
 </#if>
 
-<#if message??>
+<#if post??>
     <div class="alert alert-${mode!'primary'}" role="alert">
-        ${message}
+        ${post}
     </div>
 </#if>
 

@@ -5,7 +5,7 @@
 
 Add new user
 
-${message!" "}
+${post!" "}
 
 <@l.login "/registration" true/>
 

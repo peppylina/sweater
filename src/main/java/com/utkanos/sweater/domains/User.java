@@ -39,7 +39,7 @@ public class User implements UserDetails, Serializable {
     private boolean active = false;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Message> messages = Collections.emptySet();
+    private Set<Post> posts = Collections.emptySet();
 
 
     //избавляет нас от головной боли по создании таблицы Enum'ов, fetch - способ подгрузки:
@@ -75,8 +75,8 @@ public class User implements UserDetails, Serializable {
 
     //functions
 
-    public ArrayList<Message> getListOfMessages() {
-        return messages
+    public ArrayList<Post> getListOfPosts() {
+        return posts
                 .stream()
                 .sorted((mess1, mess2) -> mess2.getTime().compareTo(mess1.getTime()))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -183,12 +183,12 @@ public class User implements UserDetails, Serializable {
         this.subscriptions = subscriptions;
     }
 
-    public Set<Message> getMessages() {
-        return messages;
+    public Set<Post> getPosts() {
+        return posts;
     }
 
-    public void setMessages(Set<Message> messages) {
-        this.messages = messages;
+    public void setPosts(Set<Post> posts) {
+        this.posts = posts;
     }
 
     public String getPassword2() {

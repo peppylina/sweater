@@ -36,6 +36,7 @@ public class ProfileController {
             @PathVariable(name = "userId") User user,
             Model model
             ) {
+        if (user == null) return "exceptions/error";
         model.addAttribute("user", user);
         model.addAttribute("hostUrl", hostUrl);
         return "userProfile";

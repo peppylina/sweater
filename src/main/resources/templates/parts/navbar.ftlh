@@ -14,7 +14,7 @@
                 <a class="nav-link" href="/">Home </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/main">News</a>
+                <a class="nav-link" href="/news">News</a>
             </li>
             <!--кнопочка для админов-->
             <#if sec.isAdmin>

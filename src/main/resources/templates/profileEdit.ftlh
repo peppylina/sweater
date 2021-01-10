@@ -32,7 +32,7 @@
         <!-- USERNAME -->
         <label for="inputUsername">User name: </label>
         <input type="text" name="username" id="inputUsername" class="form-control ${(usernameError??)?string('is-invalid', '')}"
-               placeholder="Name" value="<#if user??>${user.username!''}</#if>" required/>
+               placeholder="Name" value="<#if user??>${user.username!''}</#if>" required="required"/>
         <#if usernameError??>
             <div class="invalid-feedback">
                 ${usernameError}
@@ -77,7 +77,7 @@
     <!-- это невидимое поле обезопасит форму от хакерских атак-->
     <input type="hidden" name="_csrf" value="${_csrf.token}"/>
     <!-- USER_ID -->
-    <input type="hidden" name="id" value="<#if user??>${user.id!'1'}</#if>">
+    <input type="hidden" name="id" value="<#if user??>${user.id!'1'}</#if>"/>
 
     <button type="submit" class="btn btn-primary">Save</button>
 </form>

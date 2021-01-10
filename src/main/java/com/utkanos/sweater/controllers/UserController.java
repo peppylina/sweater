@@ -1,10 +1,9 @@
 package com.utkanos.sweater.controllers;
 
-import com.utkanos.sweater.domains.Message;
+import com.utkanos.sweater.domains.Post;
 import com.utkanos.sweater.domains.Role;
 import com.utkanos.sweater.domains.User;
-import com.utkanos.sweater.repos.MessageRepo;
-import com.utkanos.sweater.service.MessageService;
+import com.utkanos.sweater.service.PostService;
 import com.utkanos.sweater.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,7 +27,7 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private MessageService messageService;
+    private PostService postService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -57,9 +56,9 @@ public class UserController {
     public String deleteUserPost(
             @RequestParam(name = "id") User user
     ) {
-        Iterable<Message> messages = messageService.findByUserId(user);
-        for (Message mess : messages) {
-            messageService.deleteMessage(mess);
+        Iterable<Post> posts = postService.findByUserId(user);
+        for (Post post : posts) {
+            postService.deletePost(post);
         }
         userService.deleteById(user.getId());
         return "redirect:/users";

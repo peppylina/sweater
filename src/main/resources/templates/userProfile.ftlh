@@ -77,8 +77,8 @@ User user
 </div>
 </#if>
 
-<#if user.getListOfMessages()??>
-    <#include "parts/messageList.ftlh" />
+<#if user.getListOfPosts()??>
+    <#include "parts/postsList.ftlh" />
 <#else>
     No posts yet!
 </#if>
