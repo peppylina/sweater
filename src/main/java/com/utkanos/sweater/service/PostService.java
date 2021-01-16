@@ -5,11 +5,14 @@ import com.utkanos.sweater.domains.User;
 import com.utkanos.sweater.repos.PostRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
@@ -49,38 +52,42 @@ public class PostService {
         return true;
     }
 
-    public Iterable<Post> findByTag(String tagFilter) {
-        return postRepo.findByTag(tagFilter);
+    public Iterable<Post> findByTag(String tagFilter, Pageable pageable) {
+        return postRepo.findByTag(tagFilter, pageable);
     }
 
-    public Iterable<Post> findByText(String textFilter) {
-        return postRepo.findByText(textFilter);
+    public Iterable<Post> findByText(String textFilter, Pageable pageable) {
+        return postRepo.findByText(textFilter, pageable);
     }
 
-    public Iterable<Post> findAll() {
-        return postRepo.findAll();
+    public Page<Post> findAll(Pageable pageable) {
+        return postRepo.findAll(pageable);
     }
 
     public void deletePost(Post post) {
         postRepo.delete(post);
     }
 
-    public Iterable<Post> findByUserId(User user) {
+    public Page<Post> findByUserId(User user, Pageable pageable) {
+        return postRepo.findByAuthor(user, pageable);
+    }
+
+    public ArrayList<Post> findByUserId(User user) {
         return postRepo.findByAuthor(user);
     }
 
     /*
     * Ищет посты, которые выкладывали люди, на которых подписан пользователь
     * */
-    public Iterable<Post> findMyAll(User user, Long startIndex) {
-        return postRepo.findMyAll(user.getId(), startIndex, 5L);
+    public Page<Post> findMyAll(User user, Pageable pageable) {
+        return postRepo.findMyAll(user.getId(), pageable);
     }
 
-    public Iterable<Post> findMyByTag(String tagFilter, User user) {
-        return postRepo.findMyByTag(tagFilter, user.getId());
+    public Page<Post> findMyByTag(String tagFilter, User user, Pageable pageable) {
+        return postRepo.findMyByTag(tagFilter, user.getId(), pageable);
     }
 
-    public Iterable<Post> findMyByText(String textFilter, User user) {
-        return postRepo.findMyByText(textFilter, user.getId());
+    public Page<Post> findMyByText(String textFilter, User user, Pageable pageable) {
+        return postRepo.findMyByText(textFilter, user.getId(), pageable);
     }
 }

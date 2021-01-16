@@ -14,7 +14,7 @@
                 <a class="nav-link" href="/">Home </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/news">News</a>
+                <a class="nav-link" href="/news?size=5">News</a>
             </li>
             <!--кнопочка для админов-->
             <#if sec.isAdmin>
@@ -31,7 +31,7 @@
             <!-- кнопка мой профиль -->
             <#if sec.authorised>
                 <li class="nav-item">
-                    <a class="nav-link" href="/profiles/${sec.curId}">My profile</a>
+                    <a class="nav-link" href="/profiles/${sec.curId}?size=5">My profile</a>
                 </li>
             </#if>
         </ul>

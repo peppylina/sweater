@@ -23,10 +23,12 @@ public class SubscribersController {
     @GetMapping("/subscribers")
     public String getListOfSubscribers(
             Model model,
-            @RequestParam("id") User user
+            @RequestParam(name = "id", required = false) User user,
+            @AuthenticationPrincipal User curUser
     ) {
+        if (user == null) model.addAttribute("user", curUser);
+        else model.addAttribute("user", user);
         model.addAttribute("isSubscribersPage", true);
-        model.addAttribute("user", user);
         model.addAttribute("hostUrl", hostUrl);
         return "listOfSubs";
     }
@@ -34,10 +36,12 @@ public class SubscribersController {
     @GetMapping("/subscriptions")
     public String getListOfSubscriptions(
             Model model,
-            @RequestParam("id") User user
+            @RequestParam(name = "id", required = false) User user,
+            @AuthenticationPrincipal User curUser
     ) {
+        if (user == null) model.addAttribute("user", curUser);
+        else model.addAttribute("user", user);
         model.addAttribute("isSubscribersPage", false);
-        model.addAttribute("user", user);
         model.addAttribute("hostUrl", hostUrl);
         return "listOfSubs";
     }

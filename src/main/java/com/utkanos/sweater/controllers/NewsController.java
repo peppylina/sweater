@@ -5,6 +5,10 @@ import com.utkanos.sweater.domains.User;
 import com.utkanos.sweater.service.PostService;
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,25 +43,23 @@ public class NewsController {
             @AuthenticationPrincipal User user,
             @RequestParam(required = false, defaultValue = "") String tagFilter,
             @RequestParam(required = false, defaultValue = "") String textFilter,
-            @RequestParam(required = false, defaultValue = "0") String startIndex,
+            @PageableDefault(sort = {"t.time"} , direction = Sort.Direction.DESC) Pageable pageable,
             Model model
     ) {
-        ArrayList<Post> posts = new ArrayList<>();
+        Page<Post> page;
         //если у нас какой либо из фильтров не пустой, то берем сообщения по этому фильтру
         if (tagFilter != null && !tagFilter.isEmpty()) {
-            postService.findMyByTag(tagFilter, user).forEach(posts::add);
+            page = postService.findMyByTag(tagFilter, user, pageable);
         } else if(textFilter != null && !textFilter.isEmpty()) {
-            postService.findMyByText(textFilter, user).forEach(posts::add);
+            page = postService.findMyByText(textFilter, user, pageable);
         } else {
-            postService.findMyAll(user, Long.valueOf(startIndex)).forEach(posts::add);
+            page = postService.findMyAll(user, pageable);
         }
 
-        posts.sort((mess1, mess2) -> mess2.getTime().compareTo(mess1.getTime()));
-
-        model.addAttribute("posts", posts);
+        model.addAttribute("page", page);
+        model.addAttribute("url", "/news");
         model.addAttribute("textFilter", textFilter);
         model.addAttribute("tagFilter", tagFilter);
-        model.addAttribute("startIndex", startIndex);
 
         return "news";
     }
@@ -70,7 +72,8 @@ public class NewsController {
             BindingResult bindingResult,
             Model model,
             @RequestParam(required = false, defaultValue = "0") String startIndex,
-            @RequestParam("file") MultipartFile file
+            @RequestParam("file") MultipartFile file,
+            @PageableDefault(sort = {"t.time"} , direction = Sort.Direction.DESC) Pageable pageable
     ) throws IOException, FileSizeLimitExceededException {
         post.setAuthor(user);
 
@@ -83,103 +86,11 @@ public class NewsController {
             model.addAttribute("response", "OK");
         }
 
-        ArrayList<Post> posts = new ArrayList<>();
-        postService.findMyAll(user, Long.valueOf(startIndex)).forEach(posts::add);
-        posts.sort(Comparator.comparing(Post::getTime));
+        Page<Post> page = postService.findMyAll(user, pageable);
 
-        model.addAttribute("posts", posts);
-        model.addAttribute("startIndex", startIndex);
-
+        model.addAttribute("url", "/news");
+        model.addAttribute("page", page);
         return "news";
     }
 
-    @GetMapping("/news/more")
-    public String getMoreNews(
-            @AuthenticationPrincipal User user,
-            @RequestParam Long startIndex,
-            Model model
-    ) {
-        startIndex += 5;
-        ArrayList<Post> posts = new ArrayList<>();
-        postService.findMyAll(user, startIndex).forEach(posts::add);
-        if (posts.isEmpty()) {
-            startIndex -= 5;
-            postService.findMyAll(user, startIndex).forEach(posts::add);
-        }
-        model.addAttribute("startIndex", startIndex);
-        model.addAttribute("posts", posts);
-        return "news";
-    }
-
-    @GetMapping("/news/less")
-    public String getLessNews(
-            @AuthenticationPrincipal User user,
-            @RequestParam Long startIndex,
-            Model model
-    ) {
-        startIndex -= 5;
-        if (startIndex < 0) startIndex += 5;
-        ArrayList<Post> posts = new ArrayList<>();
-        postService.findMyAll(user, startIndex).forEach(posts::add);
-        if (posts.isEmpty()) {
-            startIndex += 5;
-            postService.findMyAll(user, startIndex).forEach(posts::add);
-        }
-        model.addAttribute("startIndex", startIndex);
-        model.addAttribute("posts", posts);
-        return "news";
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //архив
-
-    /*все запихнули в get main
-    @PostMapping("/filter_by_tag")
-    public String filterByTag(
-            @RequestParam String tagFilter, Map<String, Object> model
-    ) {
-        if (tagFilter == null || tagFilter.isEmpty()) {
-            return "redirect:/main";
-        }
-
-        Iterable<Message> messages = messageRepo.findByTag(tagFilter);
-
-        model.put("messages", messages);
-
-        return "main";
-    }*/
-
-    /*все запихнули в get main
-    @PostMapping("/filter_by_text")
-    public String filterByText(
-            @RequestParam String textFilter, Map<String, Object> model
-    ) {
-        if (textFilter == null || textFilter.isEmpty()) {
-            return "redirect:/main";
-        }
-        Iterable<Message> messages = messageRepo.findByText(textFilter);
-
-        model.put("messages", messages);
-
-        return "main";
-    }*/
 }

@@ -1,10 +1,14 @@
 package com.utkanos.sweater.controllers;
 
 import com.utkanos.sweater.domains.User;
+import com.utkanos.sweater.service.PostService;
 import com.utkanos.sweater.service.UserService;
 import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,16 +32,21 @@ public class ProfileController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PostService postService;
+
     @Value("http://${hostname}")
     private String hostUrl;
 
     @GetMapping("/{userId}")
     public String getProfilePage(
             @PathVariable(name = "userId") User user,
+            @PageableDefault(sort = {"time"}, direction = Sort.Direction.DESC) Pageable pageable,
             Model model
             ) {
         if (user == null) return "exceptions/error";
         model.addAttribute("user", user);
+        model.addAttribute("page", postService.findByUserId(user, pageable));
         model.addAttribute("hostUrl", hostUrl);
         return "userProfile";
     }

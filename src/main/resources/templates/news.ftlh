@@ -1,5 +1,9 @@
 <#import "parts/common.ftlh" as c>
 <#import "parts/log.ftlh" as l>
+<#import "parts/postsList.ftlh" as pl>
+<#import "parts/pager.ftlh" as pager>
+<#import "parts/security.ftlh" as sec>
+<#import "parts/post.ftlh" as p>
 
 <@c.page>
 
@@ -10,7 +14,7 @@
     </#if>
 </div>
 
-<a class="btn btn-primary m-2" data-toggle="collapse" href="#collapseForm"
+<a class="btn btn-primary mt-2" data-toggle="collapse" href="#collapseForm"
    role="button" aria-expanded="false" aria-controls="collapseForm">Add post</a>
 <div class="collapse m-2" id="collapseForm">
     <!-- Если не указать action, то при отправке других форм, он будет переходить на другие урлы,
@@ -55,12 +59,12 @@
 
 <!-- фильтр сообщений по TAG -->
 <div>
-    <form method="get" action="/news" class="form-inline m-2">
-        <div class="form-group mb-2">
+    <form method="get" action="/news" class="form-inline mt-2">
+        <div class="form-group mr-2">
             <input class="form-control" value="${tagFilter!}" type="text" name="tagFilter"/>
         </div>
 
-        <button type="submit" class="btn btn-primary mb-2">Search by Tag</button>
+        <button type="submit" class="btn btn-primary">Search by Tag</button>
 
         <!-- это невидимое поле обезопасит форму от хакерских атак, нужен только для post запросов-->
         <!--<input type="hidden" name="_csrf" value="${_csrf.token}"/>-->
@@ -69,56 +73,42 @@
 
 <!--фильтр по TEXT -->
 <div>
-    <form method="get" action="/news" class="form-inline m-2">
-        <div class="form-group mb-2">
+    <form method="get" action="/news" class="form-inline mt-2">
+        <div class="form-group mr-2">
             <input  class="form-control" type="text" name="textFilter" value="${textFilter!}"/>
         </div>
 
-        <button type="submit" class="btn btn-primary mb-2">Search by Text</button>
+        <button type="submit" class="btn btn-primary">Search by Text</button>
         <!-- это невидимое поле обезопасит форму от хакерских атак-->
         <!--<input type="hidden" name="_csrf" value="${_csrf.token}"/>-->
     </form>
 </div>
 
-<!-- Кнопка для прогрузки предыдущих постов, если они есть -->
-<#assign num = startIndex?number>
-<#if (num > 0) && (!tagFilter?has_content) && (!textFilter?has_content)>
-<form method="get" action="/news/less">
-    <input type="hidden" name="startIndex" value="${startIndex}"/>
-    <button class="btn btn-outline-warning btn-lg btn-block my-3" type="submit">Загрузить предыдущие посты</button>
-</form>
-</#if>
+
 <!-- выводим на экран сообщения -->
 
-<div> Список сообщений </div>
-<div class="card-rows" id="posts_list">
-    <#list posts as post>
-        <div class="card border-success m-5" data-id="${post.id}">
-            <#if post.filename??>
-                <img src="/img/${post.filename}" class="card-img-top p-2"/>
-            </#if>
+<div> Список постов </div>
 
-            <div class="card-body">
-                <#if post.tag??>
-                    <h5 class="card-title">${post.tag}</h5>
-                </#if>
-                <p class="card-text">${post.getTimeString()}</p>
-                <p class="card-text">${post.text!" "}</p>
-                <a href="/profiles/${post.authorId}" class="card-link">${post.authorName}</a>
-            </div>
-        </div>
-    <#else>
-    No result.
-    </#list>
-</div>
+<#assign url = "/news"/>
+<@pager.pager url page/>
+
+<!-- Кнопка для прогрузки предыдущих постов, если они есть -->
+<#if (page.hasPrevious()) && (!tagFilter?has_content) && (!textFilter?has_content)>
+    <a class="btn btn-outline-warning btn-lg btn-block my-3" href="/news?page=${page.getNumber() - 1}&size=${page.getSize()}" type="submit">
+        Загрузить предыдущие посты
+    </a>
+</#if>
+
+<@pl.listOfPosts page.content sec.user/>
 
 <!-- Кнопка для прогрузки еще постов -->
-<#if (!tagFilter?has_content) && (!textFilter?has_content)>
-<form method="get" action="/news/more">
-    <input type="hidden" name="startIndex" value="${startIndex}"/>
-    <button class="btn btn-outline-warning btn-lg btn-block my-3" type="submit">Загрузить еще посты</button>
-</form>
+<#if (!tagFilter?has_content) && (!textFilter?has_content) && (page.hasNext())>
+    <a class="btn btn-outline-warning btn-lg btn-block my-3" href="/news?page=${page.getNumber() + 1}&size=${page.getSize()}" type="submit">
+        Загрузить еще посты
+    </a>
 </#if>
+
+<@pager.pager url page/>
 
 
 </@c.page>

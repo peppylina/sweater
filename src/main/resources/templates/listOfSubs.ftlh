@@ -15,13 +15,13 @@ isSubscribersPage - true или false - показывает, на какой м
 
 <#if isSubscribersPage>
     <#list user.getListOfSubscribers() as sub>
-        <div class="container">
-            <div class="row">
+        <div class="container" id="subContainer">
+            <div class="row" id="${sub.id}">
                 <div class="col-md-auto">
                     <#if sub.ava??>
-                        <img width="100" height="100" src="img/avas/${sub.ava}">
+                        <img width="100" height="100" src="img/avas/${sub.ava}"/>
                     <#else>
-                        <img width="100" height="100" src="img/avas/default.png">
+                        <img width="100" height="100" src="img/avas/default.png"/>
                     </#if>
                 </div>
                 <div class="col">
@@ -36,13 +36,13 @@ isSubscribersPage - true или false - показывает, на какой м
 
 <#if !isSubscribersPage>
     <#list user.getListOfSubscriptions() as sub>
-        <div class="container">
-            <div class="row">
+        <div class="container" id="subContainer">
+            <div class="row" id="${sub.id}">
                 <div class="col-md-auto">
                     <#if sub.ava??>
-                        <img width="100" height="100" src="${hostUrl}/img/avas/${sub.ava}">
+                        <img width="100" height="100" src="${hostUrl}/img/avas/${sub.ava}"/>
                     <#else>
-                        <img width="100" height="100" src="${hostUrl}/img/avas/default.png">
+                        <img width="100" height="100" src="${hostUrl}/img/avas/default.png"/>
                     </#if>
                 </div>
                 <div class="col">

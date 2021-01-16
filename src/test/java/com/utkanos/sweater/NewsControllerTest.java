@@ -34,9 +34,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithUserDetails("admin")
 //указываем, какой скрипт надо выполнить до и после каждого теста. Можно указывать над конкретным тестом
 //здесь скрипты создания пользователей и сразу же создание постов от них. Порядок выполнения запросов важен!
-@Sql(value = {"/sqlScripts/create-user-before.sql", "/sqlScripts/add-subs-before.sql", "/sqlScripts/add-posts-before.sql"},
+@Sql(value = {"/newsControllerTest/create-user-before.sql", "/newsControllerTest/add-subs-before.sql", "/newsControllerTest/add-posts-before.sql"},
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(value = {"/sqlScripts/add-posts-after.sql","/sqlScripts/add-subs-after.sql", "/sqlScripts/create-user-after.sql"},
+@Sql(value = {"/newsControllerTest/add-posts-after.sql", "/newsControllerTest/add-subs-after.sql", "/newsControllerTest/create-user-after.sql"},
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class NewsControllerTest {
 
@@ -72,7 +72,7 @@ public class NewsControllerTest {
                 .andDo(print())
                 .andExpect(authenticated())
                 //ожидаем, что будет определенное число постов
-                .andExpect(xpath("//div[@id=\"posts_list\"]/div").nodeCount(4));
+                .andExpect(xpath("//*[@id=\"postCard\"]").nodeCount(4));
     }
 
     @Test
@@ -104,21 +104,21 @@ public class NewsControllerTest {
     @Test
     //тест для фильтров
     @WithUserDetails("alina")
-    public void postListFilterTextTest() throws Exception {
+    public void postListFilterTest() throws Exception {
         this.mockMvc.perform(get("/news").param("textFilter", "text"))
                 .andDo(print())
                 .andExpect(authenticated())
                 //ожидаем, что будет определенное число постов
-                .andExpect(xpath("//div[@id=\"posts_list\"]/div").nodeCount(2))
-                .andExpect(xpath("//div[@id=\"posts_list\"]/div[@data-id=2]").exists());
+                .andExpect(xpath("//*[@id=\"postCard\"]").nodeCount(2))
+                .andExpect(xpath("//div[@id=\"postBody2\"]").exists());
         this.mockMvc.perform(get("/news").param("tagFilter", "my-tag"))
                 .andDo(print())
                 .andExpect(authenticated())
                 //ожидаем, что будет определенное число постов
-                .andExpect(xpath("//div[@id=\"posts_list\"]/div").nodeCount(2))
+                .andExpect(xpath("//div[@id=\"postCard\"]").nodeCount(2))
                 //ожидаем конкретные посты
-                .andExpect(xpath("//div[@id=\"posts_list\"]/div[@data-id=1]").exists())
-                .andExpect(xpath("//div[@id=\"posts_list\"]/div[@data-id=2]").exists());
+                .andExpect(xpath("//div[@id=\"postBody1\"]").exists())
+                .andExpect(xpath("//div[@id=\"postBody2\"]").exists());
     }
 
     @Test
@@ -134,10 +134,10 @@ public class NewsControllerTest {
                 .andDo(print())
                 .andExpect(authenticated())
                 //если бы у нас возвращалась страница, но у нас идет перенаправление
-                .andExpect(xpath("//div[@id=\"posts_list\"]/div").nodeCount(5))
-                .andExpect(xpath("//div[@id=\"posts_list\"]/div[@data-id=10]").exists())
-                .andExpect(xpath("//div[@id=\"posts_list\"]/div[@data-id=10]/div/h5").string("some tag"))
-                .andExpect(xpath("//div[@id=\"posts_list\"]/div[@data-id=10]/div/p[2]").string("some text"));
+                .andExpect(xpath("//*[@id=\"postCard\"]").nodeCount(5))
+                .andExpect(xpath("//*[@id=\"postBody10\"]").exists())
+                .andExpect(xpath("//*[@id=\"postBody10\"]/h5").string("some tag"))
+                .andExpect(xpath("//*[@id=\"postBody10\"]/p[2]").string("some text"));
     }
 
 }

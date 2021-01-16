@@ -34,9 +34,9 @@
                 ${password2Error}
             </div>
             </#if>
-            <div class="g-recaptcha" data-sitekey="6LdZDOoZAAAAAFnwI9pgwTdEvzzdtMrWAkUtPSnu"></div>
+            <div class="g-recaptcha mt-3" data-sitekey="6LdZDOoZAAAAAFnwI9pgwTdEvzzdtMrWAkUtPSnu"></div>
             <#if captchaError??>
-                <div class="alert alert-danger" role="alert">
+                <div class="alert alert-danger" role="alert" id="captcha_alert">
                     ${captchaError}
                 </div>
             </#if>

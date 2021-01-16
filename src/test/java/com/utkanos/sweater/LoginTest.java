@@ -30,9 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource("/application-test.properties")
 //указываем, какой скрипт надо выполнить до и после каждого теста. Можно указывать над конкретным тестом
 //здесь скрипты создания пользователей и сразу же создание постов от них. Порядок выполнения запросов важен!
-@Sql(value = {"/sqlScripts/create-user-before.sql"},
+@Sql(value = {"/loginTest/create-user-before.sql"},
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(value = {"/sqlScripts/create-user-after.sql"},
+@Sql(value = {"/loginTest/create-user-after.sql"},
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class LoginTest {
 
@@ -73,7 +73,7 @@ public class LoginTest {
 
     @Test
     public void correctLoginTest() throws Exception {
-        this.mockMvc.perform(formLogin().user("dima").password("1"));
+        //this.mockMvc.perform(formLogin().user("dima").password("1"));
         this.mockMvc.perform(formLogin().user("admin").password("1"))
                     .andDo(print())
                     .andExpect(redirectedUrl("/"))
