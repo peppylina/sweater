@@ -5,5 +5,5 @@ upload/*
 target/*
 .idea/*
 ec2-user@3.8.5.173
-*.properties
+application-dev.properties
 
